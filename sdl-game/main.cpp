@@ -3,17 +3,15 @@
 #include <SDL3/SDL_main.h>
 #include "Game.h"
 
-const float FIXED_FRAME_TIME = 1000.f / 60.f;
-float elapsedTime = 0.f;
-float accumulatedTime = 0.f;
+const double FIXED_FRAME_TIME = 1000.f / 60.f;
+double elapsedTime = 0.f;
+double accumulatedTime = 0.f;
 
 Game game;
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-	accumulatedTime = SDL_GetTicks();
-	elapsedTime = SDL_GetTicks();
 	return game.Init();
 }
 
@@ -26,7 +24,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 /* This function runs once per frame. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    float deltaTime = SDL_GetTicks() - elapsedTime;
+    double deltaTime = SDL_GetTicks() - elapsedTime;
     elapsedTime = SDL_GetTicks();
 
     game.Update(deltaTime);

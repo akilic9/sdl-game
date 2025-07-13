@@ -15,7 +15,7 @@ public:
 	void BeginDraw();
 	void EndDraw();
 
-	void Update(float deltaTime);
+	void Update(double deltaTime);
 
 	void OnClose();
 

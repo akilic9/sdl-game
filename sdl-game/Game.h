@@ -10,7 +10,7 @@ public:
 	SDL_AppResult Init();
 
 	SDL_AppResult HandleEvents(SDL_Event* event);
-	void Update(float deltaTime);
+	void Update(double deltaTime);
 	void FixedUpdate();
 	void Render();
 

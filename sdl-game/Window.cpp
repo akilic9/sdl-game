@@ -44,7 +44,7 @@ void Window::EndDraw()
 	SDL_RenderPresent(mRenderer);
 }
 
-void Window::Update(float deltaTime)
+void Window::Update(double deltaTime)
 {
 }
 

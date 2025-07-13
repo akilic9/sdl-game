@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <SDL3/SDL_log.h>
 #include <string>
+#include <SDL3/SDL_timer.h>
 
 Game::Game() : 
 	mWindow("idk yet"),
@@ -21,10 +22,9 @@ SDL_AppResult Game::HandleEvents(SDL_Event* event)
 	return SDL_APP_CONTINUE;
 }
 
-void Game::Update(float deltaTime)
+void Game::Update(double deltaTime)
 {
 	mWindow.Update(deltaTime);
-	mDeltaTime = deltaTime;
 }
 
 void Game::FixedUpdate()
@@ -34,22 +34,6 @@ void Game::FixedUpdate()
 void Game::Render()
 {
 	mWindow.BeginDraw();
-
-	std::string message = std::to_string(1000.f / mDeltaTime);
-	int w = 0, h = 0;
-	float x, y;
-	const float scale = 4.0f;
-
-	/* Center the message and scale it up */
-	SDL_GetRenderOutputSize(mWindow.GetRenderer(), &w, &h);
-	SDL_SetRenderScale(mWindow.GetRenderer(), scale, scale);
-	x = ((w / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * SDL_strlen(message.c_str())) / 2;
-	y = ((h / scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE) / 2;
-
-	SDL_SetRenderDrawColor(mWindow.GetRenderer(), 255, 255, 255, 255);
-	SDL_RenderDebugText(mWindow.GetRenderer(), x, y, message.c_str());
-	
-	SDL_Log("FPS: %f", 1000.f / mDeltaTime);
 
 	mWindow.EndDraw();
 }
