@@ -36,11 +36,11 @@ SDL_AppResult Window::Init()
 void Window::BeginDraw()
 {
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(mRenderer);
 }
 
 void Window::EndDraw()
 {
-	SDL_RenderClear(mRenderer);
 	SDL_RenderPresent(mRenderer);
 }
 

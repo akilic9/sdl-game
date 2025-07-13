@@ -19,6 +19,9 @@ public:
 
 	void OnClose();
 
+	SDL_Renderer* GetRenderer() const { return mRenderer; }
+	SDL_Window* GetWindow() const { return mWindow; }
+
 private:
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
