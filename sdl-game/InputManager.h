@@ -43,7 +43,6 @@ public:
     ~InputManager();
 
     SDL_AppResult HandleInput(SDL_Event* event);
-    void Update();
 
     bool AddBinding(const std::string& name, std::pair<InputType, int> map);
     bool RemoveBinding(const char* bindingName);

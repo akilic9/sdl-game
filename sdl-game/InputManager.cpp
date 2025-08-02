@@ -73,10 +73,6 @@ SDL_AppResult InputManager::HandleInput(SDL_Event* event)
     return result;
 }
 
-void InputManager::Update()
-{
-}
-
 bool InputManager::AddBinding(const std::string& name, std::pair<InputType, int> map)
 {
     InputBinding* binding = new InputBinding(name, map);

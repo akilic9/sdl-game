@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -136,7 +137,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="StateBase.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="StateManager.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

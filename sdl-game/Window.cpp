@@ -52,7 +52,7 @@ SDL_AppResult Window::CreateWindowAndRenderer(const char* title, int width, int 
 {
 	if(!SDL_CreateWindowAndRenderer(title, width, height, SDL_WINDOW_RESIZABLE, &mWindow, &mRenderer) != 0)
 	{
-		SDL_Log("Couldn't create window and renderer: %s", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Couldn't create window and renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 	return SDL_APP_CONTINUE;
