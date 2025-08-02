@@ -8,7 +8,7 @@ InputBinding::InputBinding(const std::string& name, std::pair<InputType, int> ma
 
 InputManager::InputManager()
 	: mHasFocus(true)
-    , mCurrentSceneID(-2)
+	, mCurrentSceneID(-2) // Scene IDs start from 0, -1 is for universal callbacks.
 {
 	LoadBindings();
 }
@@ -40,7 +40,10 @@ SDL_AppResult InputManager::HandleInput(SDL_Event* event)
         for (auto& input : binding.second)
         {
             auto inputType = input->mInputMap.first;
-            if (inputType == (InputType)event->type)
+			auto keyScanCode = input->mInputMap.second;
+
+            // KeyScanCode 0 is SDL_SCANCODE_UNKNOWN, used for when there is no keycode needed. Like the window close button.
+            if (inputType == (InputType)event->type && (keyScanCode == 0 || keyScanCode == event->key.scancode))
             {
                 auto sceneCallbacks = mCallbacks.find(mCurrentSceneID);
                 if (sceneCallbacks != mCallbacks.end())
