@@ -1,7 +1,9 @@
 #pragma once
 #include <SDL3/SDL_events.h>
+#include <SDL3/SDL_init.h>
 #include <unordered_map>
 #include <functional>
+#include <string>
 
 enum class InputType {
 	KeyDown = SDL_EVENT_KEY_DOWN,
@@ -17,19 +19,19 @@ enum class InputType {
 	Closed = SDL_EVENT_QUIT
 };
 
-// Input type -> key code (if any)
+// Input type -> key scancode (if any)
 struct InputBinding {
-    InputBinding(const char* Name, std::pair<InputType, int> Map);
+    InputBinding(const std::string& name, std::pair<InputType, int> map);
 
     std::pair<InputType, int> mInputMap;
-    const char* mName;
+    std::string mName;
 };
 
 // Name -> binding
-using InputBindings = std::unordered_map<const char*, std::vector<InputBinding*>>;
+using InputBindings = std::unordered_map<std::string, std::vector<InputBinding*>>;
 
 // Input name -> target function
-using Callback = std::unordered_map<const char*, std::function<void(InputBinding*)>>;
+using Callback = std::unordered_map<std::string, std::function<SDL_AppResult(InputBinding*)>>;
 
 // Scene id -> scene's callbacks
 using SceneCallbacks = std::unordered_map<int, Callback>;
@@ -40,35 +42,37 @@ public:
     InputManager();
     ~InputManager();
 
-    //void HandleInputs(sf::Event Event);
+    SDL_AppResult HandleInput(SDL_Event* event);
     void Update();
 
-    bool AddBinding(const char* Name, std::pair<InputType, int> Map);
-    bool RemoveBinding(const char* BindingName);
+    bool AddBinding(const std::string& name, std::pair<InputType, int> map);
+    bool RemoveBinding(const char* bindingName);
 
     // Add a callback - i.e. register to a keybind trigger event on a scene basis.
     template<class T>
-    bool AddCallback(const int SceneID, const char* CallbackName, void(T::* Func)(InputBinding*), T* Instance)
+    bool AddCallback(const int sceneID, const std::string& callbackName, SDL_AppResult(T::* func)(InputBinding*), T* instance)
     {
         // Create a [sceneId, default constructor callback] element
-        auto Itr = mCallbacks.emplace(SceneID, Callback()).first;
+        auto Itr = mCallbacks.emplace(sceneID, Callback()).first;
+
         // Black magic https://en.cppreference.com/w/cpp/utility/functional/placeholders
-        auto Temp = std::bind(Func, Instance, std::placeholders::_1);
+        auto Temp = std::bind(func, instance, std::placeholders::_1);
+
         // Store the bound function and callback name into the previously default callback
-        return Itr->second.emplace(CallbackName, Temp).second;
+        return Itr->second.emplace(callbackName, Temp).second;
     }
 
     // Remove a callback ie unregister from a keybind on a scene basis.
-    void RemoveCallback(const int SceneID, const char* CallbackName);
+    void RemoveCallback(const int sceneID, const std::string& callbackName);
 
     
-    // If not passed a window, this function will return the mouse position relative to desktop origin.
-	// window must be passed in to get the position within the window.    
-    //sf::Vector2i GetMousePos(sf::RenderWindow* window = nullptr) const { return (window ? sf::Mouse::getPosition(*window) : sf::Mouse::getPosition()); }
+    // Return the mouse position relative to window's top left corner.
+    SDL_FPoint GetMousePosition() const;
+
 
     // Set window focus flag.
     void SetHasFocus(const bool bIsFocused);
-    void SetCurrentSceneId(const int ID);
+    void SetCurrentSceneId(const int id);
 
 private:
     bool mHasFocus;

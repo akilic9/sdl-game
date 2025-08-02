@@ -11,16 +11,13 @@ Game::~Game() {}
 
 SDL_AppResult Game::Init()
 {
+	mInputManager.AddCallback(-1, "window_close", &Window::OnClose, &mWindow);
 	return mWindow.Init();
 }
 
-SDL_AppResult Game::HandleEvents(SDL_Event* event)
+SDL_AppResult Game::HandleInput(SDL_Event* event)
 {
-	if (event->type == SDL_EVENT_QUIT)
-	{
-		return SDL_APP_SUCCESS; // End the program.
-	}
-	return SDL_APP_CONTINUE;
+	return mInputManager.HandleInput(event);
 }
 
 void Game::Update(double deltaTime)

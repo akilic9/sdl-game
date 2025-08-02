@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "InputManager.h"
 
 class Game
 {
@@ -9,7 +10,7 @@ public:
 
 	SDL_AppResult Init();
 
-	SDL_AppResult HandleEvents(SDL_Event* event);
+	SDL_AppResult HandleInput(SDL_Event* event);
 	void Update(double deltaTime);
 	void FixedUpdate();
 	void Render();
@@ -17,6 +18,7 @@ public:
 
 private:
 	Window mWindow;
+	InputManager mInputManager;
 	float mDeltaTime;
 };
 
