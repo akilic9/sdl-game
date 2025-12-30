@@ -73,6 +73,7 @@ SDL_AppResult InputManager::HandleInput(const SDL_Event* Event)
     return Result;
 }
 
+// TODO: Why is this returning something?
 bool InputManager::AddBinding(const std::string& Name, const std::pair<InputType, int>& Map)
 {
     InputBinding* Binding = new InputBinding(Name, Map);
@@ -80,6 +81,7 @@ bool InputManager::AddBinding(const std::string& Name, const std::pair<InputType
     return true;
 }
 
+// TODO: Log for fail maybe?
 bool InputManager::RemoveBinding(const char* BindingName)
 {
     const auto BindingItr = mInputBindings.find(BindingName);
@@ -90,7 +92,7 @@ bool InputManager::RemoveBinding(const char* BindingName)
     else
     {
         // Delete the binding pointers in vector.
-        for (InputBinding* Inputs : BindingItr->second)
+        for (const InputBinding* Inputs : BindingItr->second)
         { 
             delete Inputs;
             Inputs = nullptr;

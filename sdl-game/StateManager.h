@@ -18,7 +18,7 @@ public:
     void Update(float DeltaTime);
     void Render();
 
-    // Register a state to create the state object.
+    // Register a state to create a state.
     template<class T>
     void RegisterState(const std::string& StateName)
     {
@@ -47,7 +47,7 @@ protected:
     int mStateCount = 0;
     std::vector<int> mRemovalQueue;
 
-    void CreateState(const int StateId);
+    bool CreateState(const int StateId);
     void RemoveState(const int StateId);
 };
 

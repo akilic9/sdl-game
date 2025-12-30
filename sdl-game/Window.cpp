@@ -60,6 +60,5 @@ SDL_AppResult Window::CreateWindowAndRenderer(const char* Title, const int Width
 
 SDL_AppResult Window::OnClose(InputBinding* Binding)
 {
-	SDL_Log("ON CLOSE");
 	return SDL_APP_SUCCESS;
 }
