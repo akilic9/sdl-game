@@ -7,38 +7,42 @@ StateManager::StateManager()
 
 StateManager::~StateManager()
 {
-	for (auto& state : mStates)
+	for (auto& State : mStates)
 	{
-		state.second->OnDelete();
-		delete state.second;
-		state.second = nullptr;
+		State.second->OnDelete();
+		delete State.second;
+		State.second = nullptr;
 	}
 }
 
-void StateManager::Update(float deltaTime)
+void StateManager::Update(float DeltaTime)
 {
 	if (mStates.empty())
 	{
 		return;
 	}
 
-	mStates[mActiveState]->Update(deltaTime);
+	mStates[mActiveState]->Update(DeltaTime);
 }
 
-void StateManager::SwitchState(const int stateId)
+void StateManager::Render()
 {
 }
 
-void StateManager::SwitchState(const std::string& stateName)
+void StateManager::SwitchState(const int StateId)
 {
 }
 
-int StateManager::GetIdFromName(const std::string& name)
+void StateManager::SwitchState(const std::string& StateName)
+{
+}
+
+int StateManager::GetIdFromName(const std::string& Name)
 {
 	return 0;
 }
 
-void StateManager::QueueForRemoval(const int stateId)
+void StateManager::QueueForRemoval(const int StateId)
 {
 }
 
@@ -46,10 +50,10 @@ void StateManager::ProcessRemovals()
 {
 }
 
-void StateManager::CreateState(const int stateId)
+void StateManager::CreateState(const int StateId)
 {
 }
 
-void StateManager::RemoveState(const int stateId)
+void StateManager::RemoveState(const int StateId)
 {
 }

@@ -4,40 +4,40 @@
 #include "Game.h"
 
 const double FIXED_FRAME_TIME = 1000.f / 60.f;
-double elapsedTime = 0.f;
-double accumulatedTime = 0.f;
+double ElapsedTime = 0.f;
+double AccumulatedTime = 0.f;
 
-Game game;
+Game Game;
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
-	return game.Init();
+	return Game.Init();
 }
 
 // This function runs when a new event (mouse input, keypresses, etc) occurs.
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
 	//SDL_Log("Event type: %d, event key: %d", event->type, event->key.scancode);
-	return game.HandleInput(event);
+	return Game.HandleInput(event);
 }
 
 // This function runs once per frame.
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    double deltaTime = SDL_GetTicks() - elapsedTime;
-    elapsedTime = SDL_GetTicks();
+    const double DeltaTime = SDL_GetTicks() - ElapsedTime;
+    ElapsedTime = SDL_GetTicks();
 
-    game.Update(deltaTime);
+    Game.Update(DeltaTime);
 
-    accumulatedTime += deltaTime;
-    while (accumulatedTime >= FIXED_FRAME_TIME)
+    AccumulatedTime += DeltaTime;
+    while (AccumulatedTime >= FIXED_FRAME_TIME)
     {
-        game.FixedUpdate();
-        accumulatedTime -= FIXED_FRAME_TIME;
+        Game.FixedUpdate();
+        AccumulatedTime -= FIXED_FRAME_TIME;
     }
 
-    game.Render();
+    Game.Render();
 
     return SDL_APP_CONTINUE;
 }

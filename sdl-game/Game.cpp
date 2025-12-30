@@ -3,9 +3,7 @@
 #include <string>
 #include <SDL3/SDL_timer.h>
 
-Game::Game() : 
-	mWindow("idk yet"),
-	mDeltaTime(0.f) {}
+Game::Game() : mWindow("idk yet") {}
 
 Game::~Game() {}
 
@@ -15,14 +13,14 @@ SDL_AppResult Game::Init()
 	return mWindow.Init();
 }
 
-SDL_AppResult Game::HandleInput(SDL_Event* event)
+SDL_AppResult Game::HandleInput(SDL_Event* Event)
 {
-	return mInputManager.HandleInput(event);
+	return mInputManager.HandleInput(Event);
 }
 
-void Game::Update(double deltaTime)
+void Game::Update(double DeltaTime)
 {
-	mWindow.Update(deltaTime);
+	mWindow.Update(DeltaTime);
 }
 
 void Game::FixedUpdate()

@@ -12,19 +12,19 @@ Window::Window() :
 	mHeight(DEFAULT_HEIGHT),
 	mTitle(DEFAULT_TITLE) {}
 
-Window::Window(const char* title) :
+Window::Window(const char* Title) :
 	mWindow(nullptr),
 	mRenderer(nullptr),
 	mWidth(DEFAULT_WIDTH),
 	mHeight(DEFAULT_HEIGHT),
-	mTitle(title) {}
+	mTitle(Title) {}
 
-Window::Window(const char* title, int width, int height) :
+Window::Window(const char* Title, const int Width, const int Height) :
 	mWindow(nullptr),
 	mRenderer(nullptr),
-	mWidth(width),
-	mHeight(height),
-	mTitle(title) {}
+	mWidth(Width),
+	mHeight(Height),
+	mTitle(Title) {}
 
 Window::~Window() {}
 
@@ -33,24 +33,24 @@ SDL_AppResult Window::Init()
 	return CreateWindowAndRenderer(mTitle, mWidth, mHeight);
 }
 
-void Window::BeginDraw()
+void Window::BeginDraw() const
 {
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(mRenderer);
 }
 
-void Window::EndDraw()
+void Window::EndDraw() const
 {
 	SDL_RenderPresent(mRenderer);
 }
 
-void Window::Update(double deltaTime)
+void Window::Update(double DeltaTime)
 {
 }
 
-SDL_AppResult Window::CreateWindowAndRenderer(const char* title, int width, int height)
+SDL_AppResult Window::CreateWindowAndRenderer(const char* Title, const int Width, const int Height)
 {
-	if(!SDL_CreateWindowAndRenderer(title, width, height, SDL_WINDOW_RESIZABLE, &mWindow, &mRenderer) != 0)
+	if(!SDL_CreateWindowAndRenderer(Title, Width, Height, SDL_WINDOW_RESIZABLE, &mWindow, &mRenderer) != 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Couldn't create window and renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
@@ -58,7 +58,7 @@ SDL_AppResult Window::CreateWindowAndRenderer(const char* title, int width, int 
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult Window::OnClose(InputBinding* binding)
+SDL_AppResult Window::OnClose(InputBinding* Binding)
 {
 	SDL_Log("ON CLOSE");
 	return SDL_APP_SUCCESS;

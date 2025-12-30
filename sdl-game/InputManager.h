@@ -21,7 +21,7 @@ enum class InputType {
 
 // Input type -> key scancode (if any)
 struct InputBinding {
-    InputBinding(const std::string& name, std::pair<InputType, int> map);
+    InputBinding(const std::string& Name, const std::pair<InputType, int> Map);
 
     std::pair<InputType, int> mInputMap;
     std::string mName;
@@ -42,27 +42,27 @@ public:
     InputManager();
     ~InputManager();
 
-    SDL_AppResult HandleInput(SDL_Event* event);
+    SDL_AppResult HandleInput(const SDL_Event* Event);
 
-    bool AddBinding(const std::string& name, std::pair<InputType, int> map);
-    bool RemoveBinding(const char* bindingName);
+    bool AddBinding(const std::string& Name, const std::pair<InputType, int>& Map);
+    bool RemoveBinding(const char* BindingName);
 
     // Add a callback - i.e. register to a keybind trigger event on a scene basis.
     template<class T>
-    bool AddCallback(const int sceneID, const std::string& callbackName, SDL_AppResult(T::* func)(InputBinding*), T* instance)
+    bool AddCallback(const int SceneID, const std::string& CallbackName, SDL_AppResult(T::* func)(InputBinding*), T* Instance)
     {
         // Create a [sceneId, default constructor callback] element
-        auto Itr = mCallbacks.emplace(sceneID, Callback()).first;
+        const auto Itr = mCallbacks.emplace(SceneID, Callback()).first;
 
         // Black magic https://en.cppreference.com/w/cpp/utility/functional/placeholders
-        auto Temp = std::bind(func, instance, std::placeholders::_1);
+        auto Temp = std::bind(func, Instance, std::placeholders::_1);
 
         // Store the bound function and callback name into the previously default callback
-        return Itr->second.emplace(callbackName, Temp).second;
+        return Itr->second.emplace(CallbackName, Temp).second;
     }
 
     // Remove a callback ie unregister from a keybind on a scene basis.
-    void RemoveCallback(const int sceneID, const std::string& callbackName);
+    void RemoveCallback(const int SceneID, const std::string& CallbackName);
 
     
     // Return the mouse position relative to window's top left corner.
@@ -71,7 +71,7 @@ public:
 
     // Set window focus flag.
     void SetHasFocus(const bool bIsFocused);
-    void SetCurrentSceneId(const int id);
+    void SetCurrentSceneId(const int ID);
 
 private:
     bool mHasFocus;

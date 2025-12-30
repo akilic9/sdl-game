@@ -3,8 +3,8 @@
 #include <fstream>
 #include <string>
 
-InputBinding::InputBinding(const std::string& name, std::pair<InputType, int> map)
-    : mName(name), mInputMap(map) {}
+InputBinding::InputBinding(const std::string& Name, const std::pair<InputType, int> Map)
+    : mInputMap(Map), mName(Name) {}
 
 InputManager::InputManager()
 	: mHasFocus(true)
@@ -15,118 +15,118 @@ InputManager::InputManager()
 
 InputManager::~InputManager()
 {
-    for (auto& binding : mInputBindings)
+    for (std::pair<const std::string, std::vector<InputBinding*>>& Binding : mInputBindings)
     {
-        for (auto& input : binding.second)
+        for (const InputBinding* Input : Binding.second)
         {
-            delete input;
-            input = nullptr;
+            delete Input;
+            Input = nullptr;
         }
-        binding.second.clear();
+        Binding.second.clear();
     }
 }
 
-SDL_AppResult InputManager::HandleInput(SDL_Event* event)
+SDL_AppResult InputManager::HandleInput(const SDL_Event* Event)
 {
     if (!mHasFocus)
     {
         return SDL_APP_CONTINUE; // Ignore input if the window is not focused.
 	}
 
-	SDL_AppResult result = SDL_APP_CONTINUE;
+	SDL_AppResult Result = SDL_APP_CONTINUE;
 
-    for (auto& binding : mInputBindings)
+    for (std::pair<const std::string, std::vector<InputBinding*>>& Binding : mInputBindings)
     {
-        for (auto& input : binding.second)
+        for (InputBinding* Input : Binding.second)
         {
-            auto inputType = input->mInputMap.first;
-			auto keyScanCode = input->mInputMap.second;
+            const InputType Type = Input->mInputMap.first;
+			const int KeyScanCode = Input->mInputMap.second;
 
             // KeyScanCode 0 is SDL_SCANCODE_UNKNOWN, used for when there is no keycode needed. Like the window close button.
-            if (inputType == (InputType)event->type && (keyScanCode == 0 || keyScanCode == event->key.scancode))
+            if (Type == static_cast<InputType>(Event->type) && (KeyScanCode == 0 || KeyScanCode == Event->key.scancode))
             {
-                auto sceneCallbacks = mCallbacks.find(mCurrentSceneID);
-                if (sceneCallbacks != mCallbacks.end())
+                auto SceneCallbacks = mCallbacks.find(mCurrentSceneID);
+                if (SceneCallbacks != mCallbacks.end())
                 {
-                    auto bindingName = binding.first;
-                    auto callback = sceneCallbacks->second.find(bindingName);
-                    if (callback != sceneCallbacks->second.end())
+                    const std::string& BindingName = Binding.first;
+                    auto CallbackItr = SceneCallbacks->second.find(BindingName);
+                    if (CallbackItr != SceneCallbacks->second.end())
                     {
-                        result = callback->second(input);
+                        Result = CallbackItr->second(Input);
                     }
                 }
 
                 // -1 is callbacks that are scene independent. Check if this binding is in there.
-                auto universalCallbacks = mCallbacks.find(-1); 
-                if (universalCallbacks != mCallbacks.end())
+                auto UniversalCallbacksItr = mCallbacks.find(-1); 
+                if (UniversalCallbacksItr != mCallbacks.end())
                 {
-                    auto callback = universalCallbacks->second.find(binding.first);
-                    if (callback != universalCallbacks->second.end())
+                    auto CallbackItr = UniversalCallbacksItr->second.find(Binding.first);
+                    if (CallbackItr != UniversalCallbacksItr->second.end())
                     {
-                        result = callback->second(input);
+                        Result = CallbackItr->second(Input);
                     }
                 }
             }
         }
     }
 
-    return result;
+    return Result;
 }
 
-bool InputManager::AddBinding(const std::string& name, std::pair<InputType, int> map)
+bool InputManager::AddBinding(const std::string& Name, const std::pair<InputType, int>& Map)
 {
-    InputBinding* binding = new InputBinding(name, map);
-    mInputBindings[name].push_back(binding);
+    InputBinding* Binding = new InputBinding(Name, Map);
+    mInputBindings[Name].push_back(Binding);
     return true;
 }
 
-bool InputManager::RemoveBinding(const char* bindingName)
+bool InputManager::RemoveBinding(const char* BindingName)
 {
-    auto binding = mInputBindings.find(bindingName);
-    if (binding == mInputBindings.end())
+    const auto BindingItr = mInputBindings.find(BindingName);
+    if (BindingItr == mInputBindings.end())
     {
         return false;
     }
     else
     {
         // Delete the binding pointers in vector.
-        for (auto& inputs : binding->second)
+        for (InputBinding* Inputs : BindingItr->second)
         { 
-            delete inputs;
-            inputs = nullptr;
+            delete Inputs;
+            Inputs = nullptr;
         }
 
-        binding->second.clear(); // Clear vector.
-        mInputBindings.erase(binding); // Erase map element.
+        BindingItr->second.clear(); // Clear vector.
+        mInputBindings.erase(BindingItr); // Erase map element.
         return true;
     }
 }
 
-void InputManager::RemoveCallback(const int sceneID, const std::string& callbackName)
+void InputManager::RemoveCallback(const int SceneID, const std::string& CallbackName)
 {
     // Check if callbacks for this scene exist.
-    auto scene = mCallbacks.find(sceneID);
-    if (scene == mCallbacks.end())
+    const auto Scene = mCallbacks.find(SceneID);
+    if (Scene == mCallbacks.end())
     {
         return;
     }
 
     // Check if a keybind by this name exist in this scene's callbacks.
-    auto callback = scene->second.find(callbackName);
-    if (callback == scene->second.end())
+    const auto Callback = Scene->second.find(CallbackName);
+    if (Callback == Scene->second.end())
     {
         return;
     }
 
     // Delete the binding callback you found.
-    scene->second.erase(callbackName);
+    Scene->second.erase(CallbackName);
 }
 
 SDL_FPoint InputManager::GetMousePosition() const
 {
-	SDL_FPoint mousePos;
-    SDL_GetMouseState(&mousePos.x, &mousePos.y);
-    return mousePos;
+	SDL_FPoint MousePos;
+    SDL_GetMouseState(&MousePos.x, &MousePos.y);
+    return MousePos;
 }
 
 void InputManager::SetHasFocus(const bool bIsFocused)
@@ -139,60 +139,60 @@ void InputManager::SetHasFocus(const bool bIsFocused)
     mHasFocus = bIsFocused;
 }
 
-void InputManager::SetCurrentSceneId(const int id)
+void InputManager::SetCurrentSceneId(const int ID)
 {
-    if (mCurrentSceneID == id)
+    if (mCurrentSceneID == ID)
     {
         return;
     }
 
-    mCurrentSceneID = id;
+    mCurrentSceneID = ID;
 }
 
 void InputManager::LoadBindings()
 {
-    std::ifstream bindingsStream;
-    std::string filePath = "Data/InputBindings.cfg";
-    bindingsStream.open(filePath);
+    std::ifstream BindingsStream;
+    std::string FilePath = "Data/InputBindings.cfg";
+    BindingsStream.open(FilePath);
 
     // Can't open file.
-    if (!bindingsStream.is_open())
+    if (!BindingsStream.is_open())
     {
         SDL_LogError(SDL_LOG_CATEGORY_INPUT, "Cannot open InputBindings.cfg!");
         return;
     }
 
-    std::string line;
-    while (std::getline(bindingsStream, line))
+    std::string Line;
+    while (std::getline(BindingsStream, Line))
     {
-        std::string equalSeparator = "=";
-        int separatorIndex = line.find(equalSeparator);
-        if (separatorIndex != std::string::npos)
+        std::string EqualSeparator = "=";
+        int SeparatorIndex = Line.find(EqualSeparator);
+        if (SeparatorIndex != std::string::npos)
         {
-            std::string actionName = line.substr(0, separatorIndex);
-            std::string actionCodes = line.substr(separatorIndex + equalSeparator.length(), line.length());
+            std::string ActionName = Line.substr(0, SeparatorIndex);
+            std::string ActionCodes = Line.substr(SeparatorIndex + EqualSeparator.length(), Line.length());
 
-            std::string actionSeparator = "/";
-            int actionSeparatorIndex = actionCodes.find(actionSeparator);
+            std::string ActionSeparator = "/";
+            int ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
 
-            while (actionSeparatorIndex != std::string::npos)
+            while (ActionSeparatorIndex != std::string::npos)
             {
-                std::string actionEvent = actionCodes.substr(0, actionSeparatorIndex);
-                std::string keySeparator = ":";
+                std::string ActionEvent = ActionCodes.substr(0, ActionSeparatorIndex);
+                std::string KeySeparator = ":";
 
-                int eventSeparatorIndex = actionEvent.find(keySeparator);
-                if (eventSeparatorIndex != std::string::npos)
+                int EventSeparatorIndex = ActionEvent.find(KeySeparator);
+                if (EventSeparatorIndex != std::string::npos)
                 {
-                    int eventType = stoi(actionEvent.substr(0, eventSeparatorIndex));
-                    int eventKey = stoi(actionEvent.substr(eventSeparatorIndex + keySeparator.length(), actionEvent.length()));
+                    int EventType = stoi(ActionEvent.substr(0, EventSeparatorIndex));
+                    int EventKey = stoi(ActionEvent.substr(EventSeparatorIndex + KeySeparator.length(), ActionEvent.length()));
 
-                    AddBinding(actionName, std::make_pair((InputType)eventType, eventKey));
+                    AddBinding(ActionName, std::make_pair((InputType)EventType, EventKey));
                 }
 
-                actionCodes = actionCodes.substr(actionSeparatorIndex + actionSeparator.length(), actionCodes.length());
-                actionSeparatorIndex = actionCodes.find(actionSeparator);
+                ActionCodes = ActionCodes.substr(ActionSeparatorIndex + ActionSeparator.length(), ActionCodes.length());
+                ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
             }
         }
     }
-    bindingsStream.close();
+    BindingsStream.close();
 }

@@ -10,8 +10,8 @@ public:
 
 	SDL_AppResult Init();
 
-	SDL_AppResult HandleInput(SDL_Event* event);
-	void Update(double deltaTime);
+	SDL_AppResult HandleInput(SDL_Event* Event);
+	void Update(double DeltaTime);
 	void FixedUpdate();
 	void Render();
 
@@ -19,6 +19,5 @@ public:
 private:
 	Window mWindow;
 	InputManager mInputManager;
-	float mDeltaTime;
 };
 

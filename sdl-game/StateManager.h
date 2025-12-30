@@ -15,27 +15,27 @@ public:
     StateManager();
     ~StateManager();
 
-    void Update(float deltaTime);
+    void Update(float DeltaTime);
     void Render();
 
     // Register a state to create the state object.
     template<class T>
-    void RegisterState(const std::string& stateName)
+    void RegisterState(const std::string& StateName)
     {
-        int stateId = mStateCount++;
-        mNameToIdMap[stateName] = stateId;
-        mFactory[stateId] = [stateName, stateId, this]() -> StateBase*
+        const int StateId = mStateCount++;
+        mNameToIdMap[StateName] = StateId;
+        mFactory[StateId] = [StateName, StateId, this]() -> StateBase*
             { 
-                return new T(stateName, stateId, this);
+                return new T(StateName, StateId, this);
             };
     }
 
-    virtual void SwitchState(const int stateId);
-    virtual void SwitchState(const std::string& stateName);
+    virtual void SwitchState(const int StateId);
+    virtual void SwitchState(const std::string& StateName);
 
-    int GetIdFromName(const std::string& name);
+    int GetIdFromName(const std::string& Name);
 
-    void QueueForRemoval(const int stateId);
+    void QueueForRemoval(const int StateId);
     void ProcessRemovals();
 
 
@@ -47,7 +47,7 @@ protected:
     int mStateCount = 0;
     std::vector<int> mRemovalQueue;
 
-    void CreateState(const int stateId);
-    void RemoveState(const int stateId);
+    void CreateState(const int StateId);
+    void RemoveState(const int StateId);
 };
 
