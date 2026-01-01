@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "InputManager.h"
+#include "SceneManager.h"
 
 class Game
 {
@@ -19,5 +20,6 @@ public:
 private:
 	Window mWindow;
 	InputManager mInputManager;
+	SceneManager mSceneManager;
 };
 

@@ -1,21 +1,22 @@
 #pragma once
 #include <unordered_map>
 #include <functional>
-#include "StateBase.h"
+#include "SceneBase.h"
 
-using StateList = std::unordered_map<int, StateBase*>;
+using StateList = std::unordered_map<int, SceneBase*>;
 
 using NameToId = std::unordered_map<std::string, int>;
 
-using StateFactory = std::unordered_map<int, std::function<StateBase* (void)>>;
+using StateFactory = std::unordered_map<int, std::function<SceneBase* (void)>>;
 
-class StateManager
+class SceneManager
 {
 public:
-    StateManager();
-    ~StateManager();
+    SceneManager();
+    ~SceneManager();
 
-    void Update(float DeltaTime);
+    void Update(double DeltaTime);
+	void FixedUpdate();
     void Render();
 
     // Register a state to create a state.
@@ -24,7 +25,7 @@ public:
     {
         const int StateId = mStateCount++;
         mNameToIdMap[StateName] = StateId;
-        mFactory[StateId] = [StateName, StateId, this]() -> StateBase*
+        mFactory[StateId] = [StateName, StateId, this]() -> SceneBase*
             { 
                 return new T(StateName, StateId, this);
             };

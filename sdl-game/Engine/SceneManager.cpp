@@ -1,15 +1,15 @@
-#include "StateManager.h"
+#include "SceneManager.h"
 
 #include "SDL3/SDL_log.h"
 
-StateManager::StateManager()
+SceneManager::SceneManager()
 	: mActiveState(-1)
 {
 }
 
-StateManager::~StateManager()
+SceneManager::~SceneManager()
 {
-	for (std::pair<const int, StateBase*>& State : mStates)
+	for (std::pair<const int, SceneBase*>& State : mStates)
 	{
 		State.second->OnDelete();
 		delete State.second;
@@ -17,7 +17,7 @@ StateManager::~StateManager()
 	}
 }
 
-void StateManager::Update(float DeltaTime)
+void SceneManager::Update(double DeltaTime)
 {
 	if (mStates.empty())
 	{
@@ -27,7 +27,17 @@ void StateManager::Update(float DeltaTime)
 	mStates[mActiveState]->Update(DeltaTime);
 }
 
-void StateManager::Render()
+void SceneManager::FixedUpdate()
+{
+	if (mStates.empty())
+	{
+		return;
+	}
+
+	mStates[mActiveState]->FixedUpdate();
+}
+
+void SceneManager::Render()
 {
 	if (mStates.empty())
 	{
@@ -37,7 +47,7 @@ void StateManager::Render()
 	mStates[mActiveState]->Render();
 }
 
-void StateManager::SwitchState(const int StateId)
+void SceneManager::SwitchState(const int StateId)
 {
 	if (mActiveState > -1)
 	{
@@ -54,7 +64,7 @@ void StateManager::SwitchState(const int StateId)
 	mStates[mActiveState]->OnEnter();
 }
 
-void StateManager::SwitchState(const std::string& StateName)
+void SceneManager::SwitchState(const std::string& StateName)
 {
 	const auto& StateItr = mNameToIdMap.find(StateName);
 	if (StateItr != mNameToIdMap.end())
@@ -63,19 +73,19 @@ void StateManager::SwitchState(const std::string& StateName)
 	}
 }
 
-int StateManager::GetIdFromName(const std::string& Name)
+int SceneManager::GetIdFromName(const std::string& Name)
 {
 	const auto& StateItr = mNameToIdMap.find(Name);
 	
 	return StateItr != mNameToIdMap.end() ? mNameToIdMap[Name] : -1;
 }
 
-void StateManager::QueueForRemoval(const int StateId)
+void SceneManager::QueueForRemoval(const int StateId)
 {
 	mRemovalQueue.push_back(StateId);
 }
 
-void StateManager::ProcessRemovals()
+void SceneManager::ProcessRemovals()
 {
 	while (mRemovalQueue.begin() != mRemovalQueue.end())
 	{
@@ -84,7 +94,7 @@ void StateManager::ProcessRemovals()
 	}
 }
 
-bool StateManager::CreateState(const int StateId)
+bool SceneManager::CreateState(const int StateId)
 {
 	const auto& StateInfo = mFactory.find(StateId);
 	
@@ -94,13 +104,13 @@ bool StateManager::CreateState(const int StateId)
 		return false;
 	}
 	
-	StateBase* NewState = StateInfo->second();
+	SceneBase* NewState = StateInfo->second();
 	mStates[StateId] = NewState;
 	NewState->OnCreate();
 	return true;
 }
 
-void StateManager::RemoveState(const int StateId)
+void SceneManager::RemoveState(const int StateId)
 {
 	const auto& State = mStates.find(StateId);
 	if (State == mStates.end())

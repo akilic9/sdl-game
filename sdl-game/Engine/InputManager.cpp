@@ -4,7 +4,9 @@
 #include <string>
 
 InputBinding::InputBinding(const std::string& Name, const std::pair<InputType, int> Map)
-    : mInputMap(Map), mName(Name) {}
+    : mInputMap(Map)
+    , mName(Name)
+{}
 
 InputManager::InputManager()
 	: mHasFocus(true)
@@ -154,7 +156,7 @@ void InputManager::SetCurrentSceneId(const int ID)
 void InputManager::LoadBindings()
 {
     std::ifstream BindingsStream;
-    std::string FilePath = "Data/InputBindings.cfg";
+    std::string FilePath = "Game/Data/InputBindings.cfg";
     BindingsStream.open(FilePath);
 
     // Can't open file.
@@ -167,33 +169,43 @@ void InputManager::LoadBindings()
     std::string Line;
     while (std::getline(BindingsStream, Line))
     {
+        // Skip the comment lines.
+        std::string CommentIndicator = ";;";
+        if (Line[0] == CommentIndicator[0] && Line[1] == CommentIndicator[1])
+        {
+            continue;
+        }
+        
+        // Check for a binding.
         std::string EqualSeparator = "=";
         int SeparatorIndex = Line.find(EqualSeparator);
-        if (SeparatorIndex != std::string::npos)
+        if (SeparatorIndex == std::string::npos)
         {
-            std::string ActionName = Line.substr(0, SeparatorIndex);
-            std::string ActionCodes = Line.substr(SeparatorIndex + EqualSeparator.length(), Line.length());
+            continue;
+        }
+        
+        std::string ActionName = Line.substr(0, SeparatorIndex);
+        std::string ActionCodes = Line.substr(SeparatorIndex + EqualSeparator.length(), Line.length());
 
-            std::string ActionSeparator = "/";
-            int ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
+        std::string ActionSeparator = "/";
+        int ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
 
-            while (ActionSeparatorIndex != std::string::npos)
+        while (ActionSeparatorIndex != std::string::npos)
+        {
+            std::string ActionEvent = ActionCodes.substr(0, ActionSeparatorIndex);
+            std::string KeySeparator = ":";
+
+            int EventSeparatorIndex = ActionEvent.find(KeySeparator);
+            if (EventSeparatorIndex != std::string::npos)
             {
-                std::string ActionEvent = ActionCodes.substr(0, ActionSeparatorIndex);
-                std::string KeySeparator = ":";
+                int EventType = stoi(ActionEvent.substr(0, EventSeparatorIndex));
+                int EventKey = stoi(ActionEvent.substr(EventSeparatorIndex + KeySeparator.length(), ActionEvent.length()));
 
-                int EventSeparatorIndex = ActionEvent.find(KeySeparator);
-                if (EventSeparatorIndex != std::string::npos)
-                {
-                    int EventType = stoi(ActionEvent.substr(0, EventSeparatorIndex));
-                    int EventKey = stoi(ActionEvent.substr(EventSeparatorIndex + KeySeparator.length(), ActionEvent.length()));
-
-                    AddBinding(ActionName, std::make_pair((InputType)EventType, EventKey));
-                }
-
-                ActionCodes = ActionCodes.substr(ActionSeparatorIndex + ActionSeparator.length(), ActionCodes.length());
-                ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
+                AddBinding(ActionName, std::make_pair(static_cast<InputType>(EventType), EventKey));
             }
+
+            ActionCodes = ActionCodes.substr(ActionSeparatorIndex + ActionSeparator.length(), ActionCodes.length());
+            ActionSeparatorIndex = ActionCodes.find(ActionSeparator);
         }
     }
     BindingsStream.close();
